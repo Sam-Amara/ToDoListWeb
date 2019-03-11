@@ -1,0 +1,51 @@
+﻿@*@model IEnumerable<ToDoListWeb.Models.Task>*@
+@model PagedList.IPagedList<ToDoListWeb.Models.Task>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Tasks</h2>
+
+
+<table class="table">
+    <tr>
+        <th> </th>
+        <th> </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @if (item.isComplete)
+                {
+                    @Html.Raw("<s>")
+                    @Html.DisplayFor(modelItem => item.Name)
+                    @Html.Raw("</s>")
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.Name)
+                }
+
+
+            </td>
+            <td>
+                @if (!item.isComplete)
+                {
+                    @Html.ActionLink("Select", "Edit", new { id = item.ID }) @Html.Raw(" | ");
+                }
+                @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+            </td>
+        </tr>
+    }
+
+</table>
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+
