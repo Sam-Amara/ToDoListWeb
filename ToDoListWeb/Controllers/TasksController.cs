@@ -17,10 +17,28 @@ namespace ToDoListWeb.Controllers
         private ToDoListContext db = new ToDoListContext();
 
         // GET: Tasks
-        public ActionResult Index(int? page)
+        public ActionResult Index(int? page, bool? deletePage = false)
         {
             int pageSize = 25;
             int pageNumber = (page ?? 1);
+
+            int count = 0;
+
+            var myTasks = db.Tasks.ToArray();
+            while (page == null && count< myTasks.Count() && myTasks[count].isComplete)
+            {
+                count++;
+            }
+            if (count >= pageSize)
+            {
+                if ((bool)deletePage)
+                {
+                    db.Tasks.RemoveRange(myTasks.ToList().GetRange(0, 25));
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                pageNumber = (count == myTasks.Count()) ? (count / pageSize) : (count / pageSize) + 1;
+            }
 
             return View(db.Tasks.OrderBy(t => t.ID).ToPagedList(pageNumber, pageSize));
         }
@@ -53,7 +71,7 @@ namespace ToDoListWeb.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "ID,Name,isComplete")] Task task)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && task.Name != null)
             {
                 db.Tasks.Add(task);
                 db.SaveChanges();
@@ -133,6 +151,7 @@ namespace ToDoListWeb.Controllers
             Task task = db.Tasks.Find(id);
             db.Tasks.Remove(task);
             db.SaveChanges();
+
             return RedirectToAction("Index");
         }
 

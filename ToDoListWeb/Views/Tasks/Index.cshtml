@@ -5,9 +5,10 @@
 
 @{
     ViewBag.Title = "Index";
+    var count = 0;
 }
 
-<h2>Tasks</h2>
+<h2>Tasks (@Html.Raw(Model.Count()))</h2>
 
 
 <table class="table">
@@ -22,6 +23,8 @@
             <td>
                 @if (item.isComplete)
                 {
+
+                    count++;
                     @Html.Raw("<s>")
                     @Html.DisplayFor(modelItem => item.Name)
                     @Html.Raw("</s>")
@@ -44,6 +47,12 @@
     }
 
 </table>
+
+@if (Model.PageNumber == 1 && count == 25)
+{
+    @Html.ActionLink("Delete Page", "Index", new { deletePage = true} );
+    @Html.Raw("<br />");
+}
 <br />
 Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
 
