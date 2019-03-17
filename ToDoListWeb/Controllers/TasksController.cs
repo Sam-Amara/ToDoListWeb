@@ -25,6 +25,8 @@ namespace ToDoListWeb.Controllers
             int count = 0;
 
             var myTasks = db.Tasks.ToArray();
+            var maxPages = (myTasks.Count() / (pageSize + 1))+1;
+
             while (page == null && count< myTasks.Count() && myTasks[count].isComplete)
             {
                 count++;
@@ -37,7 +39,7 @@ namespace ToDoListWeb.Controllers
                     db.SaveChanges();
                     return RedirectToAction("Index");
                 }
-                pageNumber = (count == myTasks.Count()) ? (count / pageSize) : (count / pageSize) + 1;
+                pageNumber = (count > maxPages) ? maxPages : (count / pageSize) + 1;
             }
 
             return View(db.Tasks.OrderBy(t => t.ID).ToPagedList(pageNumber, pageSize));
